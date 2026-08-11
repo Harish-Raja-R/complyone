@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ShieldCheck, ArrowRight, Mail, Lock } from 'lucide-react';
+import { ShieldCheck, ArrowRight, Mail, Lock, BadgeCheck, Building2, Fingerprint } from 'lucide-react';
 import Notification from '../components/Notification';
 import { PixelLiquidBg } from '@/components/unlumen-ui/pixel-liquid-bg';
 
@@ -45,17 +45,33 @@ const Login = () => {
       <div className="auth-login-content">
         <div className="auth-card">
           <div className="auth-header" style={{ textAlign: 'center', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+              <span className="premium-chip" style={{ padding: '8px 12px', fontSize: '12px' }}>
+                <BadgeCheck size={15} /> Enterprise governance suite
+              </span>
+            </div>
             <div className="logo-container" style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-              <div className="logo-icon" style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'linear-gradient(135deg, var(--primary), var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 10px 25px rgba(79, 70, 229, 0.4)' }}>
+              <div className="logo-icon" style={{ width: '60px', height: '60px', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 22px 44px -24px rgba(15, 23, 42, 0.9)' }}>
                 <ShieldCheck size={32} />
               </div>
             </div>
-            <h2 style={{ fontSize: '32px', fontWeight: 700, letterSpacing: 0, marginBottom: '8px', color: 'var(--text-primary)' }}>
+            <h2 style={{ fontSize: '38px', fontWeight: 780, letterSpacing: 0, marginBottom: '8px', color: 'var(--text-primary)' }}>
               Welcome Back
             </h2>
-            <p style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>
+            <p style={{ fontSize: '16px', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
               Sign in to ComplyOne to manage your regulatory compliance activities.
             </p>
+          </div>
+
+          <div className="auth-feature-grid">
+            <div className="premium-mini glass-panel" style={{ padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Fingerprint size={18} color="var(--accent)" />
+              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)' }}>Secure access</span>
+            </div>
+            <div className="premium-mini glass-panel" style={{ padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Building2 size={18} color="var(--color-warning)" />
+              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)' }}>Admin ready</span>
+            </div>
           </div>
 
           {error && <Notification message={error} type="error" onClose={() => setError('')} />}
@@ -112,7 +128,7 @@ const Login = () => {
               </a>
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '16px', fontSize: '16px', marginTop: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', borderRadius: '12px', fontWeight: 600 }} disabled={loading}>
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '17px', fontSize: '16px', marginTop: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', borderRadius: '14px', fontWeight: 760 }} disabled={loading}>
               {loading ? 'Signing in...' : (
                 <>
                   Sign In <ArrowRight size={20} />

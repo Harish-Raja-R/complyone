@@ -14,7 +14,11 @@ import Audits from './pages/Audits';
 import Policies from './pages/Policies';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import { PixelLiquidBg } from '@/components/unlumen-ui/pixel-liquid-bg';
 import './App.css';
+
+const APP_DARK_PALETTE = ['#020617', '#0f766e', '#155e75', '#4f46e5', '#d97706'];
+const APP_LIGHT_PALETTE = ['#f8fafc', '#dbeafe', '#a7f3d0', '#fde68a', '#f0abfc'];
 
 const AppContent = () => {
   const { user, loading } = useAuth();
@@ -71,6 +75,15 @@ const AppContent = () => {
   };
 
   return (
+    <PixelLiquidBg
+      className="app-shell-bg"
+      darkPalette={APP_DARK_PALETTE}
+      lightPalette={APP_LIGHT_PALETTE}
+      pixelSize={18}
+      resolution={0.28}
+      mouseForce={5}
+      cursorSize={120}
+    >
     <div className="app-container">
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
       <div className="main-layout">
@@ -80,6 +93,7 @@ const AppContent = () => {
         </main>
       </div>
     </div>
+    </PixelLiquidBg>
   );
 };
 

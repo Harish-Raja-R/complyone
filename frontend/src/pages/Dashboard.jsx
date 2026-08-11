@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
   FileText, ShieldAlert, CheckSquare, ClipboardList, 
-  HelpCircle, BookOpen, AlertTriangle 
+  HelpCircle, BookOpen, AlertTriangle, Activity, Sparkles, Clock3
 } from 'lucide-react';
 import DashboardCard from '../components/DashboardCard';
 
@@ -85,9 +85,42 @@ const Dashboard = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div>
-        <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--text-primary)' }}>Overview</h1>
-        <p style={{ color: 'var(--text-secondary)' }}>Welcome to ComplyOne compliance command center.</p>
+      <div className="dashboard-hero">
+        <div>
+          <span className="dashboard-title-eyebrow">Compliance command center</span>
+          <h1 style={{ fontSize: '42px', fontWeight: 780, color: 'var(--text-primary)', marginTop: '6px' }}>Overview</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '17px', marginTop: '4px' }}>
+            Welcome to ComplyOne. Your controls, risks, audits, and tasks are tuned into one live workspace.
+          </p>
+        </div>
+        <div className="dashboard-hero-actions">
+          <span className="premium-chip"><Activity size={16} /> Live posture</span>
+          <span className="premium-chip"><Sparkles size={16} /> Premium workspace</span>
+        </div>
+      </div>
+
+      <div className="premium-strip">
+        <div className="premium-mini glass-panel">
+          <span className="dashboard-title-eyebrow">Assurance score</span>
+          <strong>{stats.complianceScore}% operationally ready</strong>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '6px' }}>
+            Based on completed tasks, active requirements, and current risk movement.
+          </p>
+        </div>
+        <div className="premium-mini glass-panel">
+          <span className="dashboard-title-eyebrow">Next review</span>
+          <strong>Today</strong>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '6px' }}>
+            {upcomingTasks.length} task checkpoints need attention.
+          </p>
+        </div>
+        <div className="premium-mini glass-panel">
+          <span className="dashboard-title-eyebrow">Risk pulse</span>
+          <strong>{riskStats.Critical + riskStats.High} priority items</strong>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '6px' }}>
+            Critical and high risks are surfaced first.
+          </p>
+        </div>
       </div>
 
       {/* KPI Cards Grid */}
@@ -184,7 +217,7 @@ const Dashboard = () => {
       </div>
 
       {/* Department Score & Upcoming Tasks */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+      <div className="dashboard-two-column">
         {/* Department performance column chart */}
         <div className="card glass-panel">
           <h3 style={{ fontSize: '16px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Department Compliance</h3>
@@ -227,7 +260,9 @@ const Dashboard = () => {
                     <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Req: {t.requirement_title}</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Due: {t.due_date}</span>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                      <Clock3 size={13} /> {t.due_date}
+                    </span>
                     <span className={`badge badge-non-compliant`} style={{ fontSize: '11px', padding: '2px 8px' }}>
                       {t.priority}
                     </span>
