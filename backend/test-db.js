@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { query, queryOne } from './config/db.js';
 import bcrypt from 'bcryptjs';
 
@@ -17,7 +18,7 @@ async function runLocalTests() {
     console.log(`PASS: Requirements count: ${reqsCount.count}`);
 
     // Check custom password hashing verification
-    const adminUser = await queryOne('SELECT * FROM users WHERE email = "admin@complyone.com"');
+    const adminUser = await queryOne('SELECT * FROM users WHERE email = ?', ['admin@complyone.com']);
     if (adminUser) {
       const isMatch = await bcrypt.compare('password123', adminUser.password);
       console.log(`PASS: Admin user password comparison: ${isMatch ? 'SUCCESS' : 'FAILED'}`);
