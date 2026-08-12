@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
-  FileText, ShieldAlert, CheckSquare, ClipboardList, 
+  FileText, ShieldAlert, CheckSquare, 
   HelpCircle, BookOpen, AlertTriangle, Activity, Sparkles, Clock3
 } from 'lucide-react';
 import DashboardCard from '../components/DashboardCard';
@@ -73,7 +73,7 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlignment: 'center' }}>Loading dashboard compliance stats...</div>;
+    return <div style={{ padding: '40px', textAlign: 'center' }}>Loading dashboard compliance stats...</div>;
   }
 
   // Circular gauge calculations

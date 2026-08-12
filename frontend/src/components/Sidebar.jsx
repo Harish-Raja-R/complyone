@@ -3,8 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import { 
   LayoutDashboard, ShieldAlert, FileText, CheckSquare, 
   FileCheck, ShieldQuestion, ClipboardList, BookOpen, 
-  BarChart3, Settings, ShieldAlertIcon 
+  BarChart3, Settings, Sparkles
 } from 'lucide-react';
+import complyOneLogo from '../assets/complyone-logo.png';
 
 const Sidebar = ({ activePage, setActivePage }) => {
   const { user } = useAuth();
@@ -31,26 +32,35 @@ const Sidebar = ({ activePage, setActivePage }) => {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <div className="logo-icon">C1</div>
-        <span className="logo-text">ComplyOne</span>
+        <div className="brand-lockup" aria-label="ComplyOne">
+          <span className="brand-logo-frame">
+            <img className="brand-logo brand-logo-sidebar" src={complyOneLogo} alt="" />
+          </span>
+          <span className="brand-copy">
+            <strong>ComplyOne</strong>
+            <span>Governance OS</span>
+          </span>
+        </div>
       </div>
       <nav className="sidebar-menu">
         {allowedItems.map((item) => {
           const Icon = item.icon;
           return (
-            <div
+            <button
               key={item.id}
+              type="button"
               className={`menu-item ${activePage === item.id ? 'active' : ''}`}
               onClick={() => setActivePage(item.id)}
             >
               <Icon size={20} />
               <span>{item.label}</span>
-            </div>
+            </button>
           );
         })}
       </nav>
-      <div style={{ padding: '20px', borderTop: '1px solid var(--border-color)', fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center' }}>
-        v1.0 &copy; 2026 ComplyOne
+      <div className="sidebar-footer">
+        <span className="sidebar-footer-chip"><Sparkles size={13} /> v1.0</span>
+        <span>&copy; 2026 ComplyOne</span>
       </div>
     </aside>
   );

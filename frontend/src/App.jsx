@@ -8,6 +8,7 @@ import Requirements from './pages/Requirements';
 import Controls from './pages/Controls';
 import Tasks from './pages/Tasks';
 import Evidence from './pages/Evidence';
+import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Risks from './pages/Risks';
 import Audits from './pages/Audits';
@@ -24,6 +25,7 @@ const AppContent = () => {
   const { user, loading } = useAuth();
   const [activePage, setActivePage] = useState('dashboard');
   const [globalSearch, setGlobalSearch] = useState('');
+  const [showLogin, setShowLogin] = useState(false);
 
   if (loading) {
     return (
@@ -42,7 +44,11 @@ const AppContent = () => {
   }
 
   if (!user) {
-    return <Login />;
+    return showLogin ? (
+      <Login onBackToLanding={() => setShowLogin(false)} />
+    ) : (
+      <Landing onLoginClick={() => setShowLogin(true)} />
+    );
   }
 
   const renderPage = () => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Bell, Search, LogOut, User, CheckSquare } from 'lucide-react';
+import { Bell, Search, LogOut } from 'lucide-react';
 
 const Navbar = ({ onSearchChange }) => {
   const { user, logout, authFetch } = useAuth();

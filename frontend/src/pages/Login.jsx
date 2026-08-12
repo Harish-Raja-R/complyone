@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ShieldCheck, ArrowRight, Mail, Lock, BadgeCheck, Building2, Fingerprint } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Mail, Lock, BadgeCheck, Building2, Fingerprint } from 'lucide-react';
 import Notification from '../components/Notification';
 import { PixelLiquidBg } from '@/components/unlumen-ui/pixel-liquid-bg';
+import complyOneLogo from '../assets/complyone-logo.png';
 
 const LOGIN_DARK_PALETTE = ['#020617', '#0f766e', '#2563eb', '#c026d3', '#f97316'];
 const LOGIN_LIGHT_PALETTE = ['#f8fafc', '#bae6fd', '#60a5fa', '#a78bfa', '#f472b6'];
 
-const Login = () => {
+const Login = ({ onBackToLanding }) => {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,21 +45,26 @@ const Login = () => {
     >
       <div className="auth-login-content">
         <div className="auth-card">
-          <div className="auth-header" style={{ textAlign: 'center', marginBottom: '8px' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-              <span className="premium-chip" style={{ padding: '8px 12px', fontSize: '12px' }}>
+          {onBackToLanding && (
+            <button className="auth-back-button" type="button" onClick={onBackToLanding}>
+              <ArrowLeft size={16} /> Overview
+            </button>
+          )}
+          <div className="auth-header">
+            <div className="auth-chip-row">
+              <span className="premium-chip premium-chip-compact">
                 <BadgeCheck size={15} /> Enterprise governance suite
               </span>
             </div>
-            <div className="logo-container" style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-              <div className="logo-icon" style={{ width: '60px', height: '60px', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 22px 44px -24px rgba(15, 23, 42, 0.9)' }}>
-                <ShieldCheck size={32} />
-              </div>
+            <div className="logo-container auth-logo-container">
+              <span className="auth-logo-frame">
+                <img className="brand-logo brand-logo-auth" src={complyOneLogo} alt="ComplyOne" />
+              </span>
             </div>
-            <h2 style={{ fontSize: '38px', fontWeight: 780, letterSpacing: 0, marginBottom: '8px', color: 'var(--text-primary)' }}>
+            <h2 className="auth-title">
               Welcome Back
             </h2>
-            <p style={{ fontSize: '16px', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+            <p className="auth-subtitle">
               Sign in to ComplyOne to manage your regulatory compliance activities.
             </p>
           </div>
@@ -76,9 +82,9 @@ const Login = () => {
 
           {error && <Notification message={error} type="error" onClose={() => setError('')} />}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+          <form className="auth-form" onSubmit={handleSubmit}>
             <div className="form-group" style={{ position: 'relative' }}>
-              <label className="form-label" style={{ fontWeight: 500, marginBottom: '8px', display: 'block' }}>Email Address</label>
+              <label className="form-label">Email Address</label>
               <div style={{ position: 'relative' }}>
                 <div style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
                   <Mail size={20} />
@@ -96,7 +102,7 @@ const Login = () => {
             </div>
 
             <div className="form-group" style={{ position: 'relative' }}>
-              <label className="form-label" style={{ fontWeight: 500, marginBottom: '8px', display: 'block' }}>Password</label>
+              <label className="form-label">Password</label>
               <div style={{ position: 'relative' }}>
                 <div style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}>
                   <Lock size={20} />
@@ -128,7 +134,7 @@ const Login = () => {
               </a>
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '17px', fontSize: '16px', marginTop: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', borderRadius: '14px', fontWeight: 760 }} disabled={loading}>
+            <button type="submit" className="btn btn-primary auth-submit" disabled={loading}>
               {loading ? 'Signing in...' : (
                 <>
                   Sign In <ArrowRight size={20} />
