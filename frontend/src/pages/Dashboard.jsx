@@ -6,6 +6,30 @@ import {
 } from 'lucide-react';
 import DashboardCard from '../components/DashboardCard';
 
+const useCountUp = (value, duration = 1000) => {
+  const numericValue = Number(value) || 0;
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    let frame = 0;
+    let startTime = null;
+
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplayValue(Math.round(numericValue * eased));
+
+      if (progress < 1) frame = requestAnimationFrame(animate);
+    };
+
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [numericValue, duration]);
+
+  return displayValue;
+};
+
 const Dashboard = () => {
   const { authFetch } = useAuth();
   const [stats, setStats] = useState({
@@ -23,10 +47,34 @@ const Dashboard = () => {
   const [riskStats, setRiskStats] = useState({ Critical: 0, High: 0, Medium: 0, Low: 0 });
   const [upcomingTasks, setUpcomingTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const animatedComplianceScore = useCountUp(stats.complianceScore, 1200);
 
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  useEffect(() => {
+    const revealItems = [...document.querySelectorAll('.dashboard-reveal')];
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    revealItems.forEach((item, index) => {
+      item.style.setProperty('--dashboard-reveal-delay', `${Math.min(index * 55, 380)}ms`);
+      observer.observe(item);
+    });
+
+    return () => observer.disconnect();
+  }, [loading]);
 
   const fetchDashboardData = async () => {
     try {
@@ -82,10 +130,17 @@ const Dashboard = () => {
   const normalizedRadius = radius - strokeWidth * 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDashoffset = circumference - (stats.complianceScore / 100) * circumference;
+  const totalRegisteredItems = stats.activeRequirements + stats.completedTasks;
+  const riskCellCounts = {
+    critical: riskStats.Critical || 0,
+    high: riskStats.High || 0,
+    medium: riskStats.Medium || 0,
+    low: riskStats.Low || 0
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div className="dashboard-hero">
+    <div className="dashboard-motion-shell" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div className="dashboard-hero dashboard-reveal">
         <div>
           <span className="dashboard-title-eyebrow">Compliance command center</span>
           <h1 style={{ fontSize: '42px', fontWeight: 780, color: 'var(--text-primary)', marginTop: '6px' }}>Overview</h1>
@@ -100,21 +155,21 @@ const Dashboard = () => {
       </div>
 
       <div className="premium-strip">
-        <div className="premium-mini glass-panel">
+        <div className="premium-mini glass-panel dashboard-motion-card dashboard-reveal">
           <span className="dashboard-title-eyebrow">Assurance score</span>
-          <strong>{stats.complianceScore}% operationally ready</strong>
+          <strong>{animatedComplianceScore}% operationally ready</strong>
           <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '6px' }}>
             Based on completed tasks, active requirements, and current risk movement.
           </p>
         </div>
-        <div className="premium-mini glass-panel">
+        <div className="premium-mini glass-panel dashboard-motion-card dashboard-reveal">
           <span className="dashboard-title-eyebrow">Next review</span>
           <strong>Today</strong>
           <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '6px' }}>
             {upcomingTasks.length} task checkpoints need attention.
           </p>
         </div>
-        <div className="premium-mini glass-panel">
+        <div className="premium-mini glass-panel dashboard-motion-card dashboard-reveal">
           <span className="dashboard-title-eyebrow">Risk pulse</span>
           <strong>{riskStats.Critical + riskStats.High} priority items</strong>
           <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '6px' }}>
@@ -136,12 +191,12 @@ const Dashboard = () => {
       {/* Compliance Gauge & Risks Matrix */}
       <div className="dashboard-metrics-container">
         {/* Compliance score circular gauge */}
-        <div className="compliance-gauge-card glass-panel" style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', alignItems: 'center', gap: '30px' }}>
+        <div className="compliance-gauge-card glass-panel dashboard-motion-card dashboard-reveal" style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', alignItems: 'center', gap: '30px' }}>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <div className="gauge-circle">
-              <svg height={radius * 2} width={radius * 2}>
+              <svg height={radius * 2} width={radius * 2} className="dashboard-progress-ring">
                 <circle
-                  stroke="var(--border-color)"
+                  className="dashboard-progress-track"
                   fill="transparent"
                   strokeWidth={strokeWidth}
                   r={normalizedRadius}
@@ -149,18 +204,18 @@ const Dashboard = () => {
                   cy={radius}
                 />
                 <circle
-                  stroke="var(--primary)"
+                  className="dashboard-progress-value"
                   fill="transparent"
                   strokeWidth={strokeWidth}
                   strokeDasharray={circumference + ' ' + circumference}
-                  style={{ strokeDashoffset, transform: 'rotate(-90deg)', transformOrigin: '50% 50%', transition: 'stroke-dashoffset 0.5s ease' }}
+                  style={{ '--dash-start': circumference, '--dash-offset': strokeDashoffset, strokeDashoffset }}
                   r={normalizedRadius}
                   cx={radius}
                   cy={radius}
                 />
               </svg>
               <div style={{ position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <span className="gauge-percentage">{stats.complianceScore}%</span>
+                <span className="gauge-percentage">{animatedComplianceScore}%</span>
                 <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Compliant</span>
               </div>
             </div>
@@ -168,18 +223,18 @@ const Dashboard = () => {
           <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: 600 }}>Overall Compliance Health</h3>
             <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-              Calculated based on <strong>{stats.completedTasks}</strong> completed activities out of <strong>{stats.activeRequirements + stats.completedTasks}</strong> registered items.
+              Calculated based on <strong>{stats.completedTasks}</strong> completed activities out of <strong>{totalRegisteredItems}</strong> registered items.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+            <div className="compliance-health-list" style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', '--row-accent': 'var(--color-compliant)' }}>
                 <span>Compliant Requirements</span>
                 <span style={{ fontWeight: 600, color: 'var(--color-compliant)' }}>{distribution.Compliant || 0}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', '--row-accent': 'var(--color-part-compliant)' }}>
                 <span>Partially Compliant</span>
                 <span style={{ fontWeight: 600, color: 'var(--color-part-compliant)' }}>{distribution['Partially Compliant'] || 0}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', '--row-accent': 'var(--color-non-compliant)' }}>
                 <span>Non-Compliant</span>
                 <span style={{ fontWeight: 600, color: 'var(--color-non-compliant)' }}>{distribution['Non-Compliant'] || 0}</span>
               </div>
@@ -188,14 +243,16 @@ const Dashboard = () => {
         </div>
 
         {/* Risk Score Matrix widget */}
-        <div className="card glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Active Risk Matrix</h3>
+        <div className="card glass-panel dashboard-motion-card dashboard-reveal risk-heatmap-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Interactive 5x5 Heatmap Matrix</h3>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
             <span>Critical risks: <strong>{riskStats.Critical}</strong></span>
             <span>High: <strong>{riskStats.High}</strong></span>
             <span>Medium: <strong>{riskStats.Medium}</strong></span>
           </div>
-          <div className="risk-matrix" style={{ marginTop: '10px' }}>
+          <div className="risk-matrix-shell">
+            <span className="risk-axis risk-axis-y">Impact → (1 Low to 5 Critical)</span>
+            <div className="risk-matrix" style={{ marginTop: '10px' }}>
             {/* Simple representation of 5x5 matrix cells */}
             {Array.from({ length: 25 }).map((_, i) => {
               const x = 5 - Math.floor(i / 5); // impact (1 to 5)
@@ -207,11 +264,14 @@ const Dashboard = () => {
               else if (score >= 5) severity = 'medium';
 
               return (
-                <div key={i} className={`risk-cell ${severity}`} title={`Score: ${score}`}>
-                  {score}
+                <div key={i} className={`risk-cell ${severity}`} title={`Score: ${score}`} style={{ '--risk-delay': `${i * 28}ms` }}>
+                  <span>Score {score}</span>
+                  {riskCellCounts[severity] > 0 && score >= 8 ? <strong>{riskCellCounts[severity]}</strong> : null}
                 </div>
               );
             })}
+            </div>
+            <span className="risk-axis risk-axis-x">Probability → (1 Rare to 5 Almost Certain)</span>
           </div>
         </div>
       </div>
@@ -219,12 +279,12 @@ const Dashboard = () => {
       {/* Department Score & Upcoming Tasks */}
       <div className="dashboard-two-column">
         {/* Department performance column chart */}
-        <div className="card glass-panel">
+        <div className="card glass-panel dashboard-motion-card dashboard-reveal">
           <h3 style={{ fontSize: '16px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Department Compliance</h3>
           <div className="chart-container">
             {deptCompliance.map((item, index) => (
-              <div key={index} className="chart-bar-wrapper">
-                <div className="chart-bar" style={{ height: `${item.score}%` }}>
+              <div key={index} className="chart-bar-wrapper" style={{ '--bar-delay': `${index * 120}ms` }}>
+                <div className="chart-bar" style={{ '--bar-height': `${item.score}%`, height: `${item.score}%` }}>
                   <span className="chart-bar-value">{item.score}%</span>
                 </div>
                 <span className="chart-bar-label">{item.department}</span>
@@ -234,7 +294,7 @@ const Dashboard = () => {
         </div>
 
         {/* Upcoming deadlines */}
-        <div className="card glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="card glass-panel dashboard-motion-card dashboard-reveal" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Upcoming Tasks</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {upcomingTasks.length === 0 ? (
@@ -245,6 +305,7 @@ const Dashboard = () => {
               upcomingTasks.map((t) => (
                 <div
                   key={t.id}
+                  className="upcoming-task-row"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
