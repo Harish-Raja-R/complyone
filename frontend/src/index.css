@@ -358,6 +358,7 @@ code {
   height: 43px;
   object-fit: cover;
   width: 52px;
+  margin-left:10px;
 }
 
 .landing-brand strong,
@@ -1619,8 +1620,9 @@ code {
 .brand-logo-auth {
   aspect-ratio: 219 / 185;
   border-radius: 20px;
-  height: 138px;
+  height: 100px;
   width: auto;
+  margin-left:26px;
 }
 
 .brand-logo-sidebar {
@@ -1628,6 +1630,7 @@ code {
   object-fit: cover;
   object-position: center;
   width: 57px;
+  margin-left: 12px;
 }
 
 .brand-logo-frame {
